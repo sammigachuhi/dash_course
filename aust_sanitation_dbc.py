@@ -1,4 +1,6 @@
 # First load the necessary packages for your dash plotly app
+import urllib.parse
+
 from dash import Dash, dcc, html, callback, Input, Output, State
 from dash.exceptions import PreventUpdate
 import pandas as pd
@@ -55,7 +57,9 @@ app.layout = dbc.Container([
                  value="Western Australia",
                  multi=True,
                  placeholder="Select a State...",
-                 id="state_dropdown"),
+                 id="state_dropdown",
+                 style={
+                     "color": "black"}),
 
     # Some space
     html.Hr(),
@@ -65,6 +69,16 @@ app.layout = dbc.Container([
 
     # Some space please
     html.Hr(),
+    html.Hr(),
+
+    # The url will be here
+    html.Div(id="url"),
+    # html.A(children="Click on any public toilet",
+    #        id="url",
+    #        href="",
+    #        ),
+
+    # Spacing
     html.Hr(),
 
     # Insert a map
@@ -98,6 +112,16 @@ def update_state(selected_state):
     res = str(selected_state)[1:-1]
     return f"You have selected {res} State(s)"
 
+# Callback for printing out the url
+@callback(
+    Output(component_id="url", component_property="children"),
+    Input(component_id="map", component_property="clickData"),
+    prevent_initial_call=True
+)
+def update_url(clickdata):
+    # print(clickdata[0])
+    return f"See more of this public toilet here: {clickdata['points'][0]['customdata'][0]}"
+
 # Callback to update GeoJSON layer based on selected state
 @app.callback(
     Output(component_id="map", component_property="figure"),
@@ -111,6 +135,7 @@ def update_map(selected_state):
 
     fig = px.scatter_mapbox(dff, lat="Latitude", lon="Longitude", hover_name="Name", color="StateName",
                             hover_data=["Town", "StateName", "Address1"],
+                            custom_data=["URL"],
                             zoom=3, height=500,
                             labels={
                                 "StateName": "State"
