@@ -1,14 +1,10 @@
 # First load the necessary packages for your dash plotly app
-import urllib.parse
-
 from dash import Dash, dcc, html, callback, Input, Output, State
 from dash.exceptions import PreventUpdate
 import pandas as pd
 import geopandas as gpd
 import dash_ag_grid as dag
 import plotly.express as px
-import dash_leaflet as dl
-import json
 
 # Load the Dash bootstrap components
 import dash_bootstrap_components as dbc
@@ -18,7 +14,6 @@ load_figure_template(["all"])
 
 # Incorporate the Australian public toilets dataset
 df = pd.read_csv("data/australia_toiletmap_csv.csv")
-# df["StateName"] = ""
 
 # The below if statement is borrowed from here: https://www.geeksforgeeks.org/create-a-new-column-in-pandas-dataframe-based-on-the-existing-columns/
 def full_names(state):
@@ -47,6 +42,9 @@ df.insert(5, "StateName", df.pop("StateName"))
 
 # Initialize the app
 app = Dash(__name__, external_stylesheets=[dbc.themes.CYBORG])
+
+# Initialize server
+server = app.server
 
 # App layout
 app.layout = dbc.Container([
